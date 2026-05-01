@@ -742,52 +742,6 @@ footer{position:relative;z-index:1;padding:20px 48px;border-top:1px solid var(--
       </div>
     </div>
 
-    <div class="reveal">
-      <div class="form-label">Send A Message</div>
-      <!--
-        ════════════════════════════════════════════════
-        ACTIVATE IN 2 MIN (free):
-        1. formspree.io → sign up → New Form
-        2. Copy form ID (e.g. xbjngopq)
-        3. Replace YOUR_FORMSPREE_ID below
-        Submissions land directly in saradune6@gmail.com
-        ════════════════════════════════════════════════
-      -->
-      <form id="cform"
-        action="https://formspree.io/f/YOUR_FORMSPREE_ID"
-        method="POST"
-        class="cform"
-        onsubmit="handleForm(event)">
-        <div class="frow">
-          <div class="field">
-            <label>Name</label>
-            <input type="text" name="name" placeholder="Your name" required>
-          </div>
-          <div class="field">
-            <label>Company</label>
-            <input type="text" name="company" placeholder="Your company">
-          </div>
-        </div>
-        <div class="field">
-          <label>Email</label>
-          <input type="email" name="email" placeholder="you@company.com" required>
-        </div>
-        <div class="field">
-          <label>Role / Subject</label>
-          <input type="text" name="subject" placeholder="Senior AI Engineer · Bangalore">
-        </div>
-        <div class="field">
-          <label>Message</label>
-          <textarea name="message" placeholder="Tell me about the role and what you're building…" required></textarea>
-        </div>
-        <input type="hidden" name="_subject" value="Portfolio Inquiry — Sara Choudhary">
-        <input type="text" name="_gotcha" style="display:none">
-        <div class="fstatus ok" id="fok">✓ &nbsp; Message sent! Sara will reply soon.</div>
-        <div class="fstatus err" id="ferr">✗ &nbsp; Failed — email directly: saradune6@gmail.com</div>
-        <button type="submit" class="fsubmit" id="fsub">Send Message →</button>
-      </form>
-    </div>
-
   </div>
 </section>
 
