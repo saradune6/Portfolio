@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sara.ai — AI Engineer</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050810;
+  --surface: #0d1117;
+  --surface2: #111827;
+  --accent: #00f5c4;
+  --accent2: #7c3aed;
+  --accent3: #f59e0b;
+  --accent-dim: rgba(0,245,196,0.08);
+  --accent-glow: rgba(0,245,196,0.25);
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --muted: #4b5563;
+  --border: rgba(255,255,255,0.07);
+  --border-accent: rgba(0,245,196,0.2);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;cursor:none}
+
+/* ─── CURSOR ─── */
+.cursor{width:10px;height:10px;background:var(--accent);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;mix-blend-mode:difference}
+.cursor-ring{width:38px;height:38px;border:1.5px solid rgba(0,245,196,0.35);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998}
+
+/* ─── BG LAYERS ─── */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.25}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,245,196,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,196,0.025) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+
+/* ─── ORBS ─── */
+.orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0}
+.orb-1{width:700px;height:700px;background:radial-gradient(circle,rgba(124,58,237,0.13) 0%,transparent 70%);top:-200px;right:-150px;animation:drift1 18s ease-in-out infinite}
+.orb-2{width:500px;height:500px;background:radial-gradient(circle,rgba(0,245,196,0.08) 0%,transparent 70%);bottom:-100px;left:-100px;animation:drift2 22s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,30px)}}
+@keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-30px)}}
+
+/* ─── NAV ─── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 48px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,8,16,0.75);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;letter-spacing:-0.02em;color:var(--text);display:flex;align-items:center;gap:2px}
+.nav-logo .dot{color:var(--accent);font-size:1.4rem;line-height:0;position:relative;top:1px}
+.nav-logo .ai{color:var(--accent);font-weight:800}
+.nav-links{display:flex;gap:32px}
+.nav-links a{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--muted);text-decoration:none;letter-spacing:0.1em;text-transform:uppercase;transition:color .2s}
+.nav-links a:hover{color:var(--accent)}
+.nav-hire{font-family:'Space Mono',monospace;font-size:0.68rem;letter-spacing:0.08em;padding:9px 18px;background:var(--accent-dim);border:1px solid var(--border-accent);color:var(--accent);text-decoration:none;cursor:none;transition:background .2s,box-shadow .2s}
+.nav-hire:hover{background:rgba(0,245,196,0.15);box-shadow:0 0 20px var(--accent-glow)}
+
+/* ─── TICKER ─── */
+.ticker{overflow:hidden;height:36px;display:flex;align-items:center;border-bottom:1px solid var(--border);margin-top:60px;position:relative;z-index:1}
+.ticker-track{display:flex;animation:tick 28s linear infinite;white-space:nowrap}
+.ticker-track:hover{animation-play-state:paused}
+@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.t-item{font-family:'Space Mono',monospace;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);padding:0 24px}
+.t-sep{color:var(--accent);opacity:0.5}
+
+/* ─── HERO ─── */
+#hero{min-height:calc(100vh - 96px);display:flex;flex-direction:column;justify-content:center;padding:100px 48px 80px;position:relative;z-index:1;overflow:hidden}
+.hero-eyebrow{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--accent);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:10px;opacity:0;animation:fadeUp .6s ease forwards .1s}
+.hero-eyebrow::before{content:'';width:28px;height:1px;background:var(--accent)}
+.hero-name{font-family:'Syne',sans-serif;font-size:clamp(4rem,9vw,7.5rem);font-weight:800;line-height:.93;letter-spacing:-0.04em;margin-bottom:10px;opacity:0;animation:fadeUp .7s ease forwards .25s}
+.hero-name .hl{color:var(--accent)}
+.hero-subtitle{font-family:'Space Mono',monospace;font-size:0.78rem;letter-spacing:.1em;color:var(--text2);text-transform:uppercase;margin-bottom:28px;opacity:0;animation:fadeUp .7s ease forwards .35s}
+.hero-desc{font-size:1.05rem;color:var(--text2);font-weight:300;max-width:540px;line-height:1.75;margin-bottom:40px;opacity:0;animation:fadeUp .7s ease forwards .45s}
+.hero-desc strong{color:var(--text);font-weight:500}
+.hero-cta{display:flex;gap:14px;opacity:0;animation:fadeUp .7s ease forwards .55s}
+.btn-primary{padding:13px 30px;background:var(--accent);color:#050810;font-family:'Space Mono',monospace;font-size:0.72rem;font-weight:700;letter-spacing:.06em;border:none;cursor:none;text-decoration:none;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.btn-primary::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transform:translateX(-100%);transition:transform .5s}
+.btn-primary:hover::after{transform:translateX(100%)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px var(--accent-glow)}
+.btn-ghost{padding:13px 30px;background:transparent;color:var(--text2);font-family:'Space Mono',monospace;font-size:0.72rem;letter-spacing:.06em;border:1px solid var(--border);cursor:none;text-decoration:none;transition:border-color .2s,color .2s}
+.btn-ghost:hover{border-color:var(--border-accent);color:var(--accent)}
+.hero-stats{position:absolute;right:48px;bottom:80px;display:flex;flex-direction:column;gap:20px;opacity:0;animation:fadeUp .7s ease forwards .7s}
+.stat-item{text-align:right}
+.stat-num{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;color:var(--accent);line-height:1}
+.stat-num.v{color:#818cf8}
+.stat-num.g{color:var(--accent3)}
+.stat-lbl{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── SECTION HEADER ─── */
+.section-header{padding:80px 48px 44px;display:flex;align-items:flex-end;gap:20px;position:relative;z-index:1}
+.sh-left{}
+.section-num{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--accent);letter-spacing:.1em;margin-bottom:5px}
+.section-title{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:800;letter-spacing:-0.03em;line-height:1}
+.section-rule{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);margin-bottom:10px}
+
+/* ─── EXPERIENCE ─── */
+#experience{padding:0 48px 80px;position:relative;z-index:1}
+.exp-stack{display:flex;flex-direction:column;gap:2px}
+.exp-card{background:var(--surface);border:1px solid var(--border);overflow:hidden;transition:border-color .3s;cursor:none}
+.exp-card:hover,.exp-card.open{border-color:var(--border-accent)}
+.exp-header{padding:26px 30px;display:flex;align-items:center;justify-content:space-between;user-select:none}
+.exp-co{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:700;letter-spacing:-0.02em}
+.exp-role{font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.exp-right{display:flex;align-items:center;gap:14px}
+.exp-period{font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:.05em}
+.exp-toggle{width:30px;height:30px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:1.1rem;transition:transform .35s cubic-bezier(.34,1.2,.64,1),background .2s}
+.exp-card.open .exp-toggle{transform:rotate(45deg);background:var(--accent-dim)}
+.exp-body{max-height:0;overflow:hidden;transition:max-height .55s cubic-bezier(.4,0,.2,1)}
+.exp-card.open .exp-body{max-height:4000px}
+.exp-body-inner{padding:0 30px 30px;border-top:1px solid var(--border)}
+
+/* ─── PROJECT CARDS inside exp ─── */
+.proj-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-top:24px}
+.proj-card{background:var(--surface2);border:1px solid var(--border);padding:22px;position:relative;overflow:hidden;transition:border-color .3s,transform .3s}
+.proj-card:hover{border-color:var(--border-accent);transform:translateY(-3px)}
+.proj-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),transparent);opacity:0;transition:opacity .3s}
+.proj-card:hover::before{opacity:1}
+.proj-card.full{grid-column:span 2}
+.proj-card.accent-gold::before{background:linear-gradient(90deg,var(--accent3),transparent)}
+.proj-card.accent-gold:hover{border-color:rgba(245,158,11,0.3)}
+.proj-card.accent-violet::before{background:linear-gradient(90deg,#818cf8,transparent)}
+.proj-card.accent-violet:hover{border-color:rgba(129,140,248,0.3)}
+.proj-tag{font-family:'Space Mono',monospace;font-size:0.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.proj-tag.gold{color:var(--accent3)}
+.proj-tag.violet{color:#818cf8}
+.proj-name{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;color:var(--text);margin-bottom:10px;letter-spacing:-0.01em}
+.proj-pts{list-style:none;display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.proj-pts li{font-size:0.82rem;color:var(--text2);line-height:1.6;padding-left:14px;position:relative;font-weight:300}
+.proj-pts li::before{content:'–';position:absolute;left:0;color:var(--accent);opacity:0.4}
+.proj-pts li.gold::before{color:var(--accent3)}
+.proj-pts li.violet::before{color:#818cf8}
+.proj-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.badge{font-family:'Space Mono',monospace;font-size:0.6rem;letter-spacing:.04em;padding:4px 10px;background:var(--accent-dim);border:1px solid var(--border-accent);color:var(--accent)}
+.badge.gold{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.25);color:var(--accent3)}
+.badge.violet{background:rgba(129,140,248,0.1);border-color:rgba(129,140,248,0.25);color:#818cf8}
+.proj-tech{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+.tech-pill{font-family:'Space Mono',monospace;font-size:0.56rem;padding:3px 8px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--muted);letter-spacing:.04em}
+
+/* ─── SKILLS ─── */
+#skills{padding:0 48px 80px;position:relative;z-index:1}
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.skill-card{background:var(--surface);border:1px solid var(--border);padding:26px;position:relative;overflow:hidden;transition:transform .3s,border-color .3s,box-shadow .3s;cursor:none}
+.skill-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 60%,rgba(0,245,196,0.03))}
+.skill-card:hover{transform:translateY(-4px);border-color:var(--border-accent);box-shadow:0 12px 40px rgba(0,0,0,0.4)}
+.skill-icon{font-size:1.6rem;margin-bottom:12px;display:block}
+.skill-cat{font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;letter-spacing:-0.01em;margin-bottom:12px}
+.skill-tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-family:'Space Mono',monospace;font-size:0.58rem;letter-spacing:.05em;padding:4px 9px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--muted);transition:all .2s}
+.tag.fire{background:rgba(0,245,196,0.08);border-color:rgba(0,245,196,0.2);color:var(--accent)}
+.tag.rare{background:rgba(129,140,248,0.08);border-color:rgba(129,140,248,0.2);color:#818cf8}
+.skill-card:hover .tag{border-color:rgba(0,245,196,0.1);color:var(--text2)}
+.skill-card:hover .tag.fire{color:var(--accent)}
+.skill-card:hover .tag.rare{color:#818cf8}
+
+/* ─── FLASHCARDS ─── */
+#impact{padding:0 48px 80px;position:relative;z-index:1}
+.fc-hint-txt{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:.08em;margin-bottom:28px}
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.fc{height:175px;cursor:none;perspective:900px}
+.fc-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.4,0,.2,1)}
+.fc.flipped .fc-inner{transform:rotateY(180deg)}
+.fc-f,.fc-b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;padding:22px;display:flex;flex-direction:column;justify-content:space-between;border:1px solid var(--border)}
+.fc-f{background:var(--surface)}
+.fc-b{background:var(--surface2);border-color:var(--border-accent);transform:rotateY(180deg)}
+.fc-big{font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:800;color:var(--accent);line-height:1;letter-spacing:-0.03em}
+.fc-big.g{color:var(--accent3)}
+.fc-big.v{color:#818cf8}
+.fc-lbl{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.fc-flip{font-family:'Space Mono',monospace;font-size:0.52rem;color:rgba(255,255,255,0.1);letter-spacing:.08em;align-self:flex-end}
+.fc-b-name{font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:700;color:var(--accent);margin-bottom:7px}
+.fc-b-text{font-size:0.78rem;color:var(--text2);line-height:1.6;font-weight:300;flex:1}
+
+/* ─── EDUCATION ─── */
+#education{padding:0 48px 80px;position:relative;z-index:1}
+.edu-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.edu-card{background:var(--surface);border:1px solid var(--border);padding:32px;position:relative;overflow:hidden;transition:border-color .3s}
+.edu-card:hover{border-color:rgba(124,58,237,0.3)}
+.edu-watermark{position:absolute;right:-16px;bottom:-24px;font-family:'Syne',sans-serif;font-size:7rem;font-weight:800;color:rgba(255,255,255,0.02);letter-spacing:-0.05em;pointer-events:none;white-space:nowrap}
+.edu-deg{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:5px}
+.edu-inst{font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:24px}
+.edu-score{font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:800;color:var(--accent2);line-height:1}
+.edu-yr{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:.08em;margin-top:4px}
+
+/* ─── ACHIEVEMENTS ─── */
+#achieve{padding:0 48px 80px;position:relative;z-index:1}
+.ach-grid{display:flex;flex-wrap:wrap;gap:10px}
+.ach-chip{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);padding:13px 18px;transition:border-color .25s,transform .25s;cursor:none}
+.ach-chip:hover{border-color:rgba(245,158,11,0.35);transform:translateY(-2px)}
+.ach-chip.gold{background:rgba(245,158,11,0.05);border-color:rgba(245,158,11,0.15)}
+.ach-icon{font-size:.95rem}
+.ach-txt{font-family:'DM Sans',sans-serif;font-size:0.83rem;font-weight:400;color:var(--text)}
+
+/* ─── CONTACT ─── */
+#contact{padding:80px 48px;border-top:1px solid var(--border);position:relative;z-index:1}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.contact-headline{font-family:'Syne',sans-serif;font-size:clamp(2.2rem,4.5vw,3.8rem);font-weight:800;letter-spacing:-0.04em;line-height:.95;margin-bottom:18px}
+.contact-headline span{color:var(--accent)}
+.contact-sub{font-size:.9rem;color:var(--text2);font-weight:300;line-height:1.7;margin-bottom:36px}
+.contact-links{display:flex;flex-direction:column}
+.clink{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text2);font-family:'Space Mono',monospace;font-size:0.72rem;letter-spacing:.05em;padding:14px 0;border-bottom:1px solid var(--border);transition:color .2s}
+.clink:hover{color:var(--accent)}
+.clink-icon{width:30px;height:30px;background:rgba(255,255,255,0.04);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;transition:background .2s,border-color .2s}
+.clink:hover .clink-icon{background:var(--accent-dim);border-color:var(--border-accent)}
+.clink-arr{margin-left:auto;opacity:0;transform:translateX(-8px);transition:opacity .2s,transform .2s}
+.clink:hover .clink-arr{opacity:1;transform:translateX(0)}
+
+/* FORM */
+.form-label{font-family:'Space Mono',monospace;font-size:0.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:22px;display:flex;align-items:center;gap:8px}
+.form-label::before{content:'';width:20px;height:1px;background:var(--accent)}
+.cform{display:flex;flex-direction:column;gap:12px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-family:'Space Mono',monospace;font-size:0.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.field input,.field textarea{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:300;padding:12px 14px;outline:none;transition:border-color .25s,box-shadow .25s;resize:none;cursor:none}
+.field input::placeholder,.field textarea::placeholder{color:var(--muted)}
+.field input:focus,.field textarea:focus{border-color:var(--border-accent);box-shadow:0 0 0 3px rgba(0,245,196,0.06)}
+.field textarea{height:105px}
+.fsubmit{padding:13px 26px;background:var(--accent);color:#050810;font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;letter-spacing:.06em;border:none;cursor:none;align-self:flex-start;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.fsubmit::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transform:translateX(-100%);transition:transform .5s}
+.fsubmit:hover::before{transform:translateX(100%)}
+.fsubmit:hover{transform:translateY(-2px);box-shadow:0 6px 28px var(--accent-glow)}
+.fsubmit:disabled{opacity:.5;transform:none}
+.fstatus{padding:12px 14px;font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.06em;display:none;align-items:center;gap:8px}
+.fstatus.ok{display:flex;background:rgba(0,245,196,0.08);border:1px solid var(--border-accent);color:var(--accent)}
+.fstatus.err{display:flex;background:rgba(255,80,80,0.08);border:1px solid rgba(255,80,80,0.2);color:#f87171}
+
+/* ─── FOOTER ─── */
+footer{position:relative;z-index:1;padding:20px 48px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.footer-l{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:.08em}
+.footer-l span{color:var(--accent)}
+.footer-r{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:.06em}
+
+/* ─── REVEAL ─── */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .55s ease,transform .55s ease}
+.reveal.vis{opacity:1;transform:translateY(0)}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--accent)}
+
+@media(max-width:900px){
+  nav{padding:16px 24px}
+  .nav-links{display:none}
+  #hero{padding:80px 24px 60px}
+  .hero-stats{right:24px;bottom:40px}
+  .section-header,#experience,#skills,#impact,#education,#achieve,#contact{padding-left:24px;padding-right:24px}
+  .proj-cards{grid-template-columns:1fr}
+  .proj-card.full{grid-column:span 1}
+  .skills-grid{grid-template-columns:1fr 1fr}
+  .edu-grid,.contact-grid{grid-template-columns:1fr;gap:24px}
+  footer{padding:16px 24px;flex-direction:column;gap:6px;text-align:center}
+}
+@media(max-width:600px){
+  .skills-grid{grid-template-columns:1fr}
+  .frow{grid-template-columns:1fr}
+  .fc-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <div class="nav-logo">Sara<span class="dot">.</span><span class="ai">ai</span></div>
+  <div class="nav-links">
+    <a href="#experience">Work</a>
+    <a href="#skills">Stack</a>
+    <a href="#impact">Impact</a>
+    <a href="#education">Education</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <a href="#contact" class="nav-hire">Hire Me →</a>
+</nav>
+
+<!-- ═══ TICKER ═══ -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="t-item">LangGraph</span><span class="t-sep">◆</span>
+    <span class="t-item">MCP Protocol</span><span class="t-sep">◆</span>
+    <span class="t-item">Agentic RAG</span><span class="t-sep">◆</span>
+    <span class="t-item">Azure AI Foundry</span><span class="t-sep">◆</span>
+    <span class="t-item">PydanticAI</span><span class="t-sep">◆</span>
+    <span class="t-item">WebRTC · LiveKit</span><span class="t-sep">◆</span>
+    <span class="t-item">CatBoost · XGBoost</span><span class="t-sep">◆</span>
+    <span class="t-item">GPT-4o · Whisper</span><span class="t-sep">◆</span>
+    <span class="t-item">Hybrid Vector Search</span><span class="t-sep">◆</span>
+    <span class="t-item">Multi-Agent Systems</span><span class="t-sep">◆</span>
+    <span class="t-item">AutoGen</span><span class="t-sep">◆</span>
+    <span class="t-item">DSPy</span><span class="t-sep">◆</span>
+    <span class="t-item">LangGraph</span><span class="t-sep">◆</span>
+    <span class="t-item">MCP Protocol</span><span class="t-sep">◆</span>
+    <span class="t-item">Agentic RAG</span><span class="t-sep">◆</span>
+    <span class="t-item">Azure AI Foundry</span><span class="t-sep">◆</span>
+    <span class="t-item">PydanticAI</span><span class="t-sep">◆</span>
+    <span class="t-item">WebRTC · LiveKit</span><span class="t-sep">◆</span>
+    <span class="t-item">CatBoost · XGBoost</span><span class="t-sep">◆</span>
+    <span class="t-item">GPT-4o · Whisper</span><span class="t-sep">◆</span>
+    <span class="t-item">Hybrid Vector Search</span><span class="t-sep">◆</span>
+    <span class="t-item">Multi-Agent Systems</span><span class="t-sep">◆</span>
+    <span class="t-item">AutoGen</span><span class="t-sep">◆</span>
+    <span class="t-item">DSPy</span><span class="t-sep">◆</span>
+  </div>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <div class="hero-eyebrow">Available for AI / Agentic AI Roles · India</div>
+  <h1 class="hero-name">Sara<br><span class="hl">Choudhary</span></h1>
+  <div class="hero-subtitle">AI Engineer · Data Scientist · Builder</div>
+  <p class="hero-desc">Building <strong>production-grade Agentic AI</strong> that ships, scales, and generates real revenue — from MCP orchestration and multi-agent pipelines to RAG systems and ML models driving measurable outcomes across fintech and automotive.</p>
+  <div class="hero-cta">
+    <a href="#contact" class="btn-primary">Get In Touch</a>
+    <a href="#experience" class="btn-ghost">Explore Work ↓</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item"><div class="stat-num">₹7Cr+</div><div class="stat-lbl">Revenue Impact</div></div>
+    <div class="stat-item"><div class="stat-num g">5+</div><div class="stat-lbl">AI Systems Shipped</div></div>
+    <div class="stat-item"><div class="stat-num v">15K+</div><div class="stat-lbl">Features Built</div></div>
+    <div class="stat-item"><div class="stat-num">2+</div><div class="stat-lbl">Years Experience</div></div>
+  </div>
+</section>
+
+<!-- ═══ EXPERIENCE ═══ -->
+<section id="experience">
+  <div class="section-header reveal">
+    <div class="sh-left"><div class="section-num">01 // EXPERIENCE</div><div class="section-title">Where I've Built</div></div>
+    <div class="section-rule"></div>
+  </div>
+
+  <div class="exp-stack">
+
+    <!-- CARS24 -->
+    <div class="exp-card reveal" id="ec1">
+      <div class="exp-header" onclick="toggleExp('ec1')">
+        <div>
+          <div class="exp-co">CARS24</div>
+          <div class="exp-role">Associate III · AI Engineer / Data Scientist</div>
+        </div>
+        <div class="exp-right">
+          <div class="exp-period">Mar 2025 – Present</div>
+          <div class="exp-toggle">+</div>
+        </div>
+      </div>
+      <div class="exp-body">
+        <div class="exp-body-inner">
+          <div class="proj-cards">
+
+            <!-- AUTONAUT -->
+            <div class="proj-card full">
+              <div class="proj-tag">🤖 Phase 1 — Live</div>
+              <div class="proj-name">AUTONAUT — Avatar-Driven Agentic AI Chatbot</div>
+              <ul class="proj-pts">
+                <li>Built an Agentic GenAI platform automating SOP-driven workflows across internal CARS24 apps using <strong>PydanticAI</strong> intent extraction — classifying selling, pricing, challan, RC transfer, fulfillment, and service history requests.</li>
+                <li>Implemented <strong>Agentic RAG with Hybrid Search</strong> (Vector + Keyword) on Azure AI Search for contextual, SOP-aware, and location-aware responses from SOPs, store docs, and service history.</li>
+                <li>Orchestrated multi-agent workflows via <strong>LangGraph</strong> — deterministic execution, state management, branching, and tool-based decisioning across complex multi-step flows.</li>
+                <li>Integrated <strong>Model Context Protocol (MCP)</strong> to connect LLM agents with backend systems via secure, structured API calls — MCP tools for car pricing, challan fulfillment, RC transfer, and service history retrieval.</li>
+              </ul>
+              <div class="proj-tag" style="margin-top:14px">🎙️ Phase 2 — In Design</div>
+              <ul class="proj-pts" style="margin-top:6px">
+                <li>Designing voice-enabled AI avatar interface with <strong>GPT-4 Preview STT/TTS</strong>; evaluated Whisper and ElevenLabs on accuracy, latency, voice quality, and cost.</li>
+                <li>Architecting real-time low-latency voice streaming via <strong>WebRTC + LiveKit</strong> for seamless bidirectional audio; routing voice through existing intent layer → LangGraph → MCP tool execution.</li>
+              </ul>
+              <div class="proj-tech" style="margin-top:14px">
+                <span class="tech-pill">LangGraph</span><span class="tech-pill">PydanticAI</span><span class="tech-pill">MCP</span><span class="tech-pill">Azure AI Search</span><span class="tech-pill">WebRTC</span><span class="tech-pill">LiveKit</span><span class="tech-pill">GPT-4o</span><span class="tech-pill">Hybrid RAG</span>
+              </div>
+            </div>
+
+            <!-- Car Trade Advisory -->
+            <div class="proj-card accent-gold">
+              <div class="proj-tag gold">💹 Advisory Agent</div>
+              <div class="proj-name">Car Trade Advisory Agent</div>
+              <ul class="proj-pts">
+                <li class="gold">Sell / hold / refinance / upgrade recommendations using real vehicle data, market signals, and domain knowledge.</li>
+                <li>Vahan/ULIP APIs via MCP for real-time data fetching; Azure ML pricing model for instant valuation.</li>
+                <li>LangGraph flow: Discover → Analyze → Recommend with branching and tool-based decisioning.</li>
+                <li>Hybrid RAG (Azure AI Search) for context-aware, explainable recommendations.</li>
+              </ul>
+              <div class="proj-badges">
+                <span class="badge gold">↑ 30% User Engagement</span>
+                <span class="badge gold">↑ 8% Conversions</span>
+              </div>
+              <div class="proj-tech"><span class="tech-pill">LangGraph</span><span class="tech-pill">MCP</span><span class="tech-pill">Azure ML</span><span class="tech-pill">Hybrid RAG</span></div>
+            </div>
+
+            <!-- Feature Mart -->
+            <div class="proj-card accent-violet">
+              <div class="proj-tag violet">🧩 Agentic Feature Mart</div>
+              <div class="proj-name">15,000+ Feature ML Platform</div>
+              <ul class="proj-pts">
+                <li class="violet">Marketing, seller, clickstream, Geo-IQ, and LLM-augmented location intelligence (POIs, proximity, demographics).</li>
+                <li>Automated Argo CI/CD pipelines with monthly cron-based feature stamping and training–serving consistency.</li>
+                <li>Consumed across Buyer, Used Car Loan, Personal Loan, and CRM scoring frameworks.</li>
+              </ul>
+              <div class="proj-badges">
+                <span class="badge violet">₹5Cr+/yr Revenue</span>
+                <span class="badge violet">₹1Cr/yr CRM Savings</span>
+              </div>
+              <div class="proj-tech"><span class="tech-pill">Argo</span><span class="tech-pill">GPT-4o</span><span class="tech-pill">GeoPandas</span><span class="tech-pill">Snowflake</span></div>
+            </div>
+
+            <!-- Insurance -->
+            <div class="proj-card accent-gold">
+              <div class="proj-tag gold">📊 Propensity Model</div>
+              <div class="proj-name">Insurance Propensity Model</div>
+              <ul class="proj-pts">
+                <li class="gold">CatBoost classification predicting insurance purchase likelihood — <strong>2x lift across deciles</strong>.</li>
+                <li>Native categorical handling and ordered boosting — chosen over XGBoost and LightGBM for superior lift on high-cardinality features.</li>
+                <li>Drives targeted sales interventions; deployed via Azure ML with real-time scoring.</li>
+              </ul>
+              <div class="proj-badges"><span class="badge gold">₹1Cr/yr Incremental Revenue</span></div>
+              <div class="proj-tech"><span class="tech-pill">CatBoost</span><span class="tech-pill">Azure ML</span><span class="tech-pill">Scikit-Learn</span></div>
+            </div>
+
+            <!-- FCU -->
+            <div class="proj-card">
+              <div class="proj-tag">🔒 FCU Automation</div>
+              <div class="proj-name">Fraud Control Unit Pipeline</div>
+              <ul class="proj-pts">
+                <li>Automated document verification pipeline — Aadhaar, PAN, Voter ID, electricity bills, stamp duty.</li>
+                <li>Image quality checks + OCR-based data extraction; Selenium automation for government portal validation.</li>
+                <li>Google Gemini API for real-time CAPTCHA solving in the verification flow.</li>
+              </ul>
+              <div class="proj-badges"><span class="badge">₹85L/yr Cost Saving</span></div>
+              <div class="proj-tech"><span class="tech-pill">OCR</span><span class="tech-pill">Selenium</span><span class="tech-pill">Gemini API</span><span class="tech-pill">FastAPI</span></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BHARATPE -->
+    <div class="exp-card reveal" id="ec2">
+      <div class="exp-header" onclick="toggleExp('ec2')">
+        <div>
+          <div class="exp-co">BharatPe</div>
+          <div class="exp-role">Data Scientist Intern · Gurugram</div>
+        </div>
+        <div class="exp-right">
+          <div class="exp-period">Jul 2024 – Mar 2025</div>
+          <div class="exp-toggle">+</div>
+        </div>
+      </div>
+      <div class="exp-body">
+        <div class="exp-body-inner">
+          <div class="proj-cards">
+
+            <!-- KYC -->
+            <div class="proj-card accent-gold">
+              <div class="proj-tag gold">🪪 KYC Stack</div>
+              <div class="proj-name">Name Matching — PAN & Aadhaar</div>
+              <ul class="proj-pts">
+                <li class="gold">BERT-based name-matching model for merchant KYC — verifying identities across PAN and Aadhaar documents.</li>
+                <li>Siamese BERT + FuzzyWuzzy ensemble to handle spelling errors, transliterations, and phonetic variations in identity docs.</li>
+                <li>Deployed into production for real-time KYC workflow automation; supported vendor replacement and cost optimization.</li>
+              </ul>
+              <div class="proj-badges"><span class="badge gold">↓ 20% Verification Time</span></div>
+              <div class="proj-tech"><span class="tech-pill">BERT</span><span class="tech-pill">Siamese BERT</span><span class="tech-pill">FuzzyWuzzy</span><span class="tech-pill">FastAPI</span></div>
+            </div>
+
+            <!-- Speaker Notification -->
+            <div class="proj-card accent-violet">
+              <div class="proj-tag violet">🔔 Multi-Agent System</div>
+              <div class="proj-name">Speaker Notification & Alert System</div>
+              <ul class="proj-pts">
+                <li class="violet">Built an intelligent real-time notification system for BharatPe's physical payment speakers — triggering audio alerts when merchants receive payments, refunds, or threshold-based events.</li>
+                <li>Multi-agent coordination using <strong>AutoGen + LangGraph</strong>: a Classifier Agent for text classification of transaction messages, an NER Agent for extracting entities (amount, merchant ID, transaction type), and a Trigger Agent for deciding alert type and priority.</li>
+                <li>Real-time streaming pipeline: payment events → message classification → entity extraction → speaker trigger, reducing missed and incorrect alerts significantly.</li>
+                <li>NER-based extraction ensured context-aware alerts — e.g., distinguishing between a ₹500 payment vs. a ₹5,00,000 threshold breach, with different alert urgency levels.</li>
+                <li>Enhanced system reliability and merchant experience across BharatPe's network of smart payment speakers.</li>
+              </ul>
+              <div class="proj-tech"><span class="tech-pill">AutoGen</span><span class="tech-pill">LangGraph</span><span class="tech-pill">NER</span><span class="tech-pill">Text Classification</span><span class="tech-pill">spaCy</span><span class="tech-pill">Real-time Pipeline</span></div>
+            </div>
+
+            <!-- Aadhaar Masking -->
+            <div class="proj-card full">
+              <div class="proj-tag">🙈 PII Redaction</div>
+              <div class="proj-name">Aadhaar Masking Automation</div>
+              <ul class="proj-pts">
+                <li>Blurriness detection model using <strong>Swin Transformer</strong> to assess scan quality before processing — rejecting low-quality docs upfront to reduce downstream errors.</li>
+                <li>Automated Aadhaar number and QR code masking using <strong>RapidOCR</strong>; explored PyTesseract and Google Vision API for comparative accuracy benchmarking.</li>
+                <li>Real-time PII redaction at scale — reducing manual effort across KYC onboarding and document processing pipelines.</li>
+              </ul>
+              <div class="proj-badges"><span class="badge">₹20L/month Cost Saving</span></div>
+              <div class="proj-tech"><span class="tech-pill">Swin Transformer</span><span class="tech-pill">RapidOCR</span><span class="tech-pill">PyTorch</span><span class="tech-pill">Google Vision API</span></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RAPIPAY -->
+    <div class="exp-card reveal" id="ec3">
+      <div class="exp-header" onclick="toggleExp('ec3')">
+        <div>
+          <div class="exp-co">RapiPay Fintech</div>
+          <div class="exp-role">Data Analyst Intern · Noida</div>
+        </div>
+        <div class="exp-right">
+          <div class="exp-period">Nov 2023 – Jul 2024</div>
+          <div class="exp-toggle">+</div>
+        </div>
+      </div>
+      <div class="exp-body">
+        <div class="exp-body-inner">
+          <div class="proj-cards">
+            <div class="proj-card">
+              <div class="proj-tag">📈 Risk Analytics</div>
+              <div class="proj-name">Merchant Risk Assessment & Loan Approvals</div>
+              <ul class="proj-pts">
+                <li>Analyzed Daily Payment Data (DPD) to assess merchant financial health; built real-time risk segmentation pipelines, creditworthiness models, and interactive dashboards.</li>
+                <li>Partnered with NBFCs to identify eligible merchants for loan approvals based on transaction behavior and risk scoring.</li>
+              </ul>
+              <div class="proj-tech"><span class="tech-pill">Python</span><span class="tech-pill">SQL</span><span class="tech-pill">Power BI</span><span class="tech-pill">Scikit-Learn</span></div>
+            </div>
+            <div class="proj-card">
+              <div class="proj-tag">📊 Dashboard</div>
+              <div class="proj-name">Synapes Invoicing Dashboard</div>
+              <ul class="proj-pts">
+                <li>Vendor performance dashboard using <strong>Superset + Snowflake</strong> — tracking 3rd-party API hit rates, success/failure rates, and recurring failure patterns.</li>
+                <li>Enabled data-driven vendor replacement decisions and significant cost optimization across the invoicing stack.</li>
+              </ul>
+              <div class="proj-tech"><span class="tech-pill">Superset</span><span class="tech-pill">Snowflake</span><span class="tech-pill">SQL</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ SKILLS ═══ -->
+<section id="skills">
+  <div class="section-header reveal">
+    <div class="sh-left"><div class="section-num">02 // STACK</div><div class="section-title">Tech Arsenal</div></div>
+    <div class="section-rule"></div>
+  </div>
+
+  <div class="skills-grid">
+    <div class="skill-card reveal">
+      <span class="skill-icon">🤖</span>
+      <div class="skill-cat">Agentic AI & Orchestration</div>
+      <div class="skill-tags">
+        <span class="tag fire">LangGraph</span><span class="tag fire">MCP Protocol</span><span class="tag fire">PydanticAI</span>
+        <span class="tag rare">A2A Communication</span><span class="tag">AutoGen</span><span class="tag">CrewAI</span><span class="tag">Multi-Agent</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <span class="skill-icon">🔍</span>
+      <div class="skill-cat">RAG & Knowledge Systems</div>
+      <div class="skill-tags">
+        <span class="tag fire">Agentic RAG</span><span class="tag fire">Hybrid Search</span><span class="tag fire">Azure AI Search</span>
+        <span class="tag">Reranking</span><span class="tag">Embeddings</span><span class="tag">Pinecone</span><span class="tag">FAISS</span><span class="tag">Qdrant</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <span class="skill-icon">🧠</span>
+      <div class="skill-cat">LLMs & NLP</div>
+      <div class="skill-tags">
+        <span class="tag fire">GPT-4/5o</span><span class="tag">LLaMA · Mistral</span><span class="tag">BERT · Siamese BERT</span>
+        <span class="tag rare">Fine-Tuning (LoRA/QLoRA)</span><span class="tag">HuggingFace</span><span class="tag">spaCy · NLTK</span><span class="tag">Prompt Engineering</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <span class="skill-icon">☁️</span>
+      <div class="skill-cat">Cloud & MLOps</div>
+      <div class="skill-tags">
+        <span class="tag fire">Azure AI Foundry</span><span class="tag">AWS (S3, SageMaker, Bedrock, EC2)</span>
+        <span class="tag">GCP · Vertex AI</span><span class="tag">Snowflake</span><span class="tag">Databricks</span><span class="tag">Docker</span><span class="tag">Argo CI/CD</span><span class="tag">Airflow</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <span class="skill-icon">⚙️</span>
+      <div class="skill-cat">ML & Deep Learning</div>
+      <div class="skill-tags">
+        <span class="tag fire">CatBoost</span><span class="tag">XGBoost</span><span class="tag">Scikit-Learn</span>
+        <span class="tag">PyTorch · TensorFlow</span><span class="tag">Transformers · CNNs</span><span class="tag">Swin Transformer</span><span class="tag">Feature Engineering</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <span class="skill-icon">🎙️</span>
+      <div class="skill-cat">Voice & Real-Time</div>
+      <div class="skill-tags">
+        <span class="tag fire">WebRTC</span><span class="tag fire">LiveKit</span><span class="tag">STT / TTS</span>
+        <span class="tag">ElevenLabs</span><span class="tag">Whisper</span><span class="tag">WebSockets</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <span class="skill-icon">🛠️</span>
+      <div class="skill-cat">Backend & Automation</div>
+      <div class="skill-tags">
+        <span class="tag fire">Python · SQL</span><span class="tag">FastAPI · Flask</span><span class="tag">Streamlit</span>
+        <span class="tag">Selenium</span><span class="tag">REST APIs</span><span class="tag">LangSmith</span><span class="tag">Web Scraping</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <span class="skill-icon">📊</span>
+      <div class="skill-cat">Data & Visualization</div>
+      <div class="skill-tags">
+        <span class="tag">Pandas · NumPy</span><span class="tag">Power BI · Tableau</span><span class="tag">Superset</span>
+        <span class="tag">Grafana</span><span class="tag">QuickSight</span><span class="tag">BigQuery</span><span class="tag">Looker</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ IMPACT FLASHCARDS ═══ -->
+<section id="impact">
+  <div class="section-header reveal">
+    <div class="sh-left"><div class="section-num">03 // IMPACT</div><div class="section-title">By The Numbers</div></div>
+    <div class="section-rule"></div>
+  </div>
+
+  <p class="fc-hint-txt reveal">Tap any card to reveal the story behind the number.</p>
+  <div class="fc-grid">
+
+    <div class="fc reveal" onclick="this.classList.toggle('flipped')">
+      <div class="fc-inner">
+        <div class="fc-f"><div class="fc-big">₹5Cr+</div><div><div class="fc-lbl">Annual Revenue</div><div class="fc-flip">tap ↻</div></div></div>
+        <div class="fc-b"><div class="fc-b-name">Agentic Feature Mart</div><div class="fc-b-text">15,000+ features powering seller prioritization model across Buyer, Used Car Loan, and Personal Loan product lines.</div><div class="fc-flip">tap ↻</div></div>
+      </div>
+    </div>
+
+    <div class="fc reveal" onclick="this.classList.toggle('flipped')">
+      <div class="fc-inner">
+        <div class="fc-f"><div class="fc-big g">₹1Cr</div><div><div class="fc-lbl">CRM Savings / Year</div><div class="fc-flip">tap ↻</div></div></div>
+        <div class="fc-b"><div class="fc-b-name">Smart CRM Scoring</div><div class="fc-b-text">Feature Mart integrated into CRM scoring — eliminating unnecessary WhatsApp outreach and saving ₹1Cr/year in messaging costs.</div><div class="fc-flip">tap ↻</div></div>
+      </div>
+    </div>
+
+    <div class="fc reveal" onclick="this.classList.toggle('flipped')">
+      <div class="fc-inner">
+        <div class="fc-f"><div class="fc-big">₹85L</div><div><div class="fc-lbl">FCU Cost Saving</div><div class="fc-flip">tap ↻</div></div></div>
+        <div class="fc-b"><div class="fc-b-name">Fraud Control Unit</div><div class="fc-b-text">Automated document verification — OCR, Selenium portal validation, and Gemini CAPTCHA solving eliminating manual ops.</div><div class="fc-flip">tap ↻</div></div>
+      </div>
+    </div>
+
+    <div class="fc reveal" onclick="this.classList.toggle('flipped')">
+      <div class="fc-inner">
+        <div class="fc-f"><div class="fc-big g">30%</div><div><div class="fc-lbl">Engagement Uplift</div><div class="fc-flip">tap ↻</div></div></div>
+        <div class="fc-b"><div class="fc-b-name">Car Trade Advisory Agent</div><div class="fc-b-text">AI sell/hold/refinance/upgrade decisions via LangGraph + Azure ML + Hybrid RAG drove 30% engagement & 8% conversion improvement.</div><div class="fc-flip">tap ↻</div></div>
+      </div>
+    </div>
+
+    <div class="fc reveal" onclick="this.classList.toggle('flipped')">
+      <div class="fc-inner">
+        <div class="fc-f"><div class="fc-big v">₹20L</div><div><div class="fc-lbl">Monthly Savings</div><div class="fc-flip">tap ↻</div></div></div>
+        <div class="fc-b"><div class="fc-b-name">BharatPe — Aadhaar Masking</div><div class="fc-b-text">Swin Transformer quality detection + RapidOCR PII redaction replacing manual document processing at scale.</div><div class="fc-flip">tap ↻</div></div>
+      </div>
+    </div>
+
+    <div class="fc reveal" onclick="this.classList.toggle('flipped')">
+      <div class="fc-inner">
+        <div class="fc-f"><div class="fc-big">2x</div><div><div class="fc-lbl">Model Lift</div><div class="fc-flip">tap ↻</div></div></div>
+        <div class="fc-b"><div class="fc-b-name">Insurance Propensity · CatBoost</div><div class="fc-b-text">2x lift across deciles enabling targeted sales interventions. CatBoost's native categorical handling beat XGBoost on high-cardinality features.</div><div class="fc-flip">tap ↻</div></div>
+      </div>
+    </div>
+
+    <div class="fc reveal" onclick="this.classList.toggle('flipped')">
+      <div class="fc-inner">
+        <div class="fc-f"><div class="fc-big v">20%</div><div><div class="fc-lbl">KYC Time Reduction</div><div class="fc-flip">tap ↻</div></div></div>
+        <div class="fc-b"><div class="fc-b-name">BharatPe KYC Stack</div><div class="fc-b-text">BERT + Siamese BERT name matching in production — handling transliterations and OCR errors across PAN and Aadhaar verification flows.</div><div class="fc-flip">tap ↻</div></div>
+      </div>
+    </div>
+
+    <div class="fc reveal" onclick="this.classList.toggle('flipped')">
+      <div class="fc-inner">
+        <div class="fc-f"><div class="fc-big g">15K+</div><div><div class="fc-lbl">ML Features Built</div><div class="fc-flip">tap ↻</div></div></div>
+        <div class="fc-b"><div class="fc-b-name">Feature Mart Scale</div><div class="fc-b-text">Marketing, seller, clickstream, Geo-IQ, and LLM-augmented location features (POIs, demographics, proximity) across 4+ product lines.</div><div class="fc-flip">tap ↻</div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ EDUCATION ═══ -->
+<section id="education">
+  <div class="section-header reveal">
+    <div class="sh-left"><div class="section-num">04 // EDUCATION</div><div class="section-title">Academic Base</div></div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="edu-grid">
+    <div class="edu-card reveal">
+      <div class="edu-watermark">B.TECH</div>
+      <div class="edu-deg">B.Tech — Computer Science</div>
+      <div class="edu-inst">AKTU, Lucknow</div>
+      <div class="edu-score">8.2</div>
+      <div class="edu-yr">/ 10 CGPA · Aug 2021 – Jul 2024</div>
+    </div>
+    <div class="edu-card reveal">
+      <div class="edu-watermark">DIPLOMA</div>
+      <div class="edu-deg">Diploma — Mechanical Engineering</div>
+      <div class="edu-inst">BTE, Uttar Pradesh</div>
+      <div class="edu-score">80%</div>
+      <div class="edu-yr">Aug 2018 – Jul 2021</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ACHIEVEMENTS ═══ -->
+<section id="achieve">
+  <div class="section-header reveal">
+    <div class="sh-left"><div class="section-num">05 // RECOGNITION</div><div class="section-title">Awards & Certs</div></div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="ach-grid">
+    <div class="ach-chip gold reveal"><span class="ach-icon">🏆</span><span class="ach-txt">Orbit Excellence Award 2025 — CARS24</span></div>
+    <div class="ach-chip gold reveal"><span class="ach-icon">⭐</span><span class="ach-txt">Nominated — Founder's Award 2026</span></div>
+    <div class="ach-chip reveal"><span class="ach-icon">🥈</span><span class="ach-txt">BharatPe Hackathon Finalist — Google Hosted</span></div>
+    <div class="ach-chip reveal"><span class="ach-icon">📜</span><span class="ach-txt">Machine Learning Specialization — ML.ai</span></div>
+    <div class="ach-chip reveal"><span class="ach-icon">📜</span><span class="ach-txt">Deep Learning Specialization — DeepLearning.ai</span></div>
+    <div class="ach-chip reveal"><span class="ach-icon">📜</span><span class="ach-txt">NLP Specialization — DeepLearning.ai</span></div>
+    <div class="ach-chip reveal"><span class="ach-icon">🤖</span><span class="ach-txt">CS25: Transformers United — Stanford</span></div>
+  </div>
+</section>
+
+<!-- ═══ CONTACT ═══ -->
+<section id="contact">
+  <div class="contact-grid">
+
+    <div class="reveal">
+      <h2 class="contact-headline">Let's build<br>something<br><span>intelligent.</span></h2>
+      <p class="contact-sub">Open to full-time AI / Agentic AI Engineer roles across India. I build things that ship, scale, and generate real revenue — let's talk.</p>
+      <div class="contact-links">
+        <a href="mailto:saradune6@gmail.com" class="clink">
+          <div class="clink-icon">📧</div>saradune6@gmail.com<span class="clink-arr">→</span>
+        </a>
+        <a href="tel:+919311961839" class="clink">
+          <div class="clink-icon">📱</div>+91 93119 61839<span class="clink-arr">→</span>
+        </a>
+        <a href="https://github.com" target="_blank" class="clink">
+          <div class="clink-icon">🐙</div>GitHub<span class="clink-arr">→</span>
+        </a>
+        <a href="https://linkedin.com" target="_blank" class="clink">
+          <div class="clink-icon">💼</div>LinkedIn<span class="clink-arr">→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <div class="form-label">Send A Message</div>
+      <!--
+        ════════════════════════════════════════════════
+        ACTIVATE IN 2 MIN (free):
+        1. formspree.io → sign up → New Form
+        2. Copy form ID (e.g. xbjngopq)
+        3. Replace YOUR_FORMSPREE_ID below
+        Submissions land directly in saradune6@gmail.com
+        ════════════════════════════════════════════════
+      -->
+      <form id="cform"
+        action="https://formspree.io/f/YOUR_FORMSPREE_ID"
+        method="POST"
+        class="cform"
+        onsubmit="handleForm(event)">
+        <div class="frow">
+          <div class="field">
+            <label>Name</label>
+            <input type="text" name="name" placeholder="Your name" required>
+          </div>
+          <div class="field">
+            <label>Company</label>
+            <input type="text" name="company" placeholder="Your company">
+          </div>
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="you@company.com" required>
+        </div>
+        <div class="field">
+          <label>Role / Subject</label>
+          <input type="text" name="subject" placeholder="Senior AI Engineer · Bangalore">
+        </div>
+        <div class="field">
+          <label>Message</label>
+          <textarea name="message" placeholder="Tell me about the role and what you're building…" required></textarea>
+        </div>
+        <input type="hidden" name="_subject" value="Portfolio Inquiry — Sara Choudhary">
+        <input type="text" name="_gotcha" style="display:none">
+        <div class="fstatus ok" id="fok">✓ &nbsp; Message sent! Sara will reply soon.</div>
+        <div class="fstatus err" id="ferr">✗ &nbsp; Failed — email directly: saradune6@gmail.com</div>
+        <button type="submit" class="fsubmit" id="fsub">Send Message →</button>
+      </form>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="footer-l">Sara<span>.ai</span> · Designed & Built 2026</div>
+  <div class="footer-r">AI Engineer · Data Scientist · Builder</div>
+</footer>
+
+<script>
+// ── CURSOR ──
+const cur=document.getElementById('cursor'),ring=document.getElementById('ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cur.style.transform=`translate(${mx-5}px,${my-5}px)`;
+});
+(function drift(){rx+=(mx-rx)*.11;ry+=(my-ry)*.11;ring.style.transform=`translate(${rx-19}px,${ry-19}px)`;requestAnimationFrame(drift)})();
+
+// ── EXP ACCORDION ──
+function toggleExp(id){
+  const el=document.getElementById(id);
+  const wasOpen=el.classList.contains('open');
+  document.querySelectorAll('.exp-card').forEach(c=>c.classList.remove('open'));
+  if(!wasOpen)el.classList.add('open');
+}
+
+// ── SCROLL REVEAL ──
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      e.target.style.transitionDelay=`${i*40}ms`;
+      e.target.classList.add('vis');
+    }
+  });
+},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// ── FORMSPREE ──
+async function handleForm(e){
+  e.preventDefault();
+  const form=document.getElementById('cform');
+  const btn=document.getElementById('fsub');
+  document.getElementById('fok').className='fstatus ok';
+  document.getElementById('ferr').className='fstatus err';
+  btn.disabled=true;btn.textContent='Sending…';
+  try{
+    const res=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{Accept:'application/json'}});
+    if(res.ok){
+      document.getElementById('fok').className='fstatus ok ok';
+      form.reset();btn.textContent='Sent ✓';
+    } else throw 0;
+  }catch{
+    document.getElementById('ferr').className='fstatus err err';
+    btn.disabled=false;btn.textContent='Send Message →';
+  }
+}
+
+// ── AUTO-OPEN CARS24 ──
+setTimeout(()=>document.getElementById('ec1').classList.add('open'),500);
+</script>
+</body>
+</html>
